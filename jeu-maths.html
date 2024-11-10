@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeu de Mathématiques pour Enfants</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f8ff;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .question {
+      font-size: 1.5em;
+      margin: 20px 0;
+    }
+    .score, .timer {
+      font-size: 1.2em;
+      margin: 10px 0;
+    }
+    input[type="number"] {
+      padding: 10px;
+      font-size: 1em;
+      width: 100px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-top: 20px;
+      cursor: pointer;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+    }
+    .game-over {
+      color: red;
+      font-size: 1.5em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Jeu de Mathématiques</h1>
+  <p class="question" id="question">Appuyez sur "Commencer" pour jouer.</p>
+  <input type="number" id="answer" placeholder="Votre réponse" disabled>
+  
+  <button id="startButton" onclick="startGame()">Commencer</button>
+  
+  <p class="score" id="score">Score : 0</p>
+  <p class="timer" id="timer">Temps restant : 60 secondes</p>
+  <p id="gameOverMessage" class="game-over"></p>
+
+  <script>
+    let correctAnswer;
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval;
+
+    function startGame() {
+      score = 0;
+      timeLeft = 60;
+      document.getElementById("score").textContent = "Score : " + score;
+      document.getElementById("timer").textContent = "Temps restant : " + timeLeft + " secondes";
+      document.getElementById("gameOverMessage").textContent = "";
+      document.getElementById("answer").disabled = false;
+      document.getElementById("answer").focus();
+      document.getElementById("startButton").disabled = true;
+
+      startTimer();
+      generateQuestion();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = "Temps restant : " + timeLeft + " secondes";
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function generateQuestion() {
+      const operations = ["+", "-", "*", "/"];
+      const num1 = Math.floor(Math.random() * 10) + 1;
+      const num2 = Math.floor(Math.random() * 10) + 1;
+      const operation = operations[Math.floor(Math.random() * operations.length)];
+
+      if (operation === "/" && num1 % num2 !== 0) {
+        correctAnswer = (num1 - (num1 % num2)) / num2;
+        document.getElementById("question").textContent = `Combien fait ${num1 - (num1 % num2)} ${operation} ${num2} ?`;
+      } else {
+        correctAnswer = eval(`${num1} ${operation} ${num2}`);
+        document.getElementById("question").textContent = `Combien fait ${num1} ${operation} ${num2} ?`;
+      }
+      document.getElementById("answer").value = "";
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseInt(document.getElementById("answer").value);
+      
+      if (userAnswer === correctAnswer) {
+        score++;
+        document.getElementById("score").textContent = "Score : " + score;
+        generateQuestion();
+      }
+      document.getElementById("answer").value = "";
+    }
+
+    function endGame() {
+      document.getElementById("gameOverMessage").textContent = `Temps écoulé ! Votre score est : ${score}`;
+      document.getElementById("question").textContent = "Appuyez sur 'Commencer' pour rejouer.";
+      document.getElementById("answer").disabled = true;
+      document.getElementById("startButton").disabled = false;
+    }
+
+    document.getElementById("answer").addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+  </script>
+
+</body>
+</html>
